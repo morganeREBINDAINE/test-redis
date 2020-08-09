@@ -20,6 +20,17 @@ abstract class Controller
     }
 
     protected function render(string $template, array $vars = []) {
-        echo $this->twig->render("$template.html.twig", $vars);
+        try {
+            echo $this->twig->render("$template.html.twig", $vars);
+        } catch (\Exception $exception) {
+            $this->throwError(400);
+            $this->render('errors/400', [
+                'errorMessage' => 'Erreur: le template existe pas.'
+            ]);
+        }
+    }
+
+    protected function throwError($code) {
+        http_response_code($code);
     }
 }

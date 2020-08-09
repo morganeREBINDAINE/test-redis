@@ -1,16 +1,8 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>Test utilisation Redis</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/retwis-replica/public/style.css">
-</head>
-<body>
-<div class="container p-3 home-container mt-5">
+{% extends 'base.html.twig' %}
+
+{% block content %}
     <div>
         <h1>S'enregistrer</h1>
-        <p>Ceci est un petit test pour apprendre a connaitre une base de données no sql, ici redis.</p>
     </div>
     <div>
         <form method="post" action="register.php">
@@ -22,9 +14,11 @@
                 <label for="password">Mot de passe</label>
                 <input class="form-control" type="text" name="password">
             </div>
+            <div class="form-group">
+                <label for="password">Répéter mot de passe</label>
+                <input class="form-control" type="text" name="password">
+            </div>
             <button class="btn btn-info" type="submit">Valider</button>
         </form>
     </div>
-</div>
-</body>
-</html>
+{% endblock %}

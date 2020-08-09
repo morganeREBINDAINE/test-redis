@@ -1,0 +1,12 @@
+home:
+    path: /
+    handler: HomeController::home
+    method: GET
+login:
+    path: /me-connecter
+    handler: HomeController::login
+    method: GET
+register:
+    path: /m-enregistrer
+    handler: HomeController::register
+    method: GET

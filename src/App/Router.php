@@ -3,19 +3,15 @@
 namespace RetwisReplica\App;
 
 use \Exception;
+use FastRoute\RouteCollector;
+use function FastRoute\simpleDispatcher;
 
 class Router
 {
-    public static function start()
+    public function start()
     {
-        $dispatcher = \FastRoute\simpleDispatcher(function(\FastRoute\RouteCollector $r) {
-            $r->addRoute('GET', '/home', "\RetwisReplica\Controller\HomeController::home");
-        });
-
-        $httpMethod = $_SERVER['REQUEST_METHOD'];
-        $uri = $_SERVER['REQUEST_URI'];
-
-        $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+        $dispatcher = $this->getDispatcher();
+        $routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::NOT_FOUND:
@@ -26,24 +22,53 @@ class Router
                 // ... 405 Method Not Allowed
                 break;
             case \FastRoute\Dispatcher::FOUND:
-                $handler = $routeInfo[1];
-                $vars = $routeInfo[2];
-
-                $handler = explode('::', $handler);
-
-                $controller = $handler[0];
-                if (!isset($handler[1])) {
-                    throw new Exception('il manque la méthode');
+                try {
+                    $this->handleRoute($routeInfo);
+                } catch (Exception $e) {
+                    echo 'there is an error :' . $e->getMessage();
                 }
-
-                $method = $handler[1];
-
-                if (false === is_callable([$controller, $method])) {
-                    throw new Exception('method is not callable');
-                }
-
-                call_user_func_array([new $controller(), $method], $vars);
                 break;
         }
+    }
+
+    public function getRoutes()
+    {
+        return yaml_parse_file(CONFIG_PATH . '/routes.yaml');
+    }
+
+    public function getDispatcher()
+    {
+        $routes = $this->getRoutes();
+
+        $dispatcher = simpleDispatcher(function(RouteCollector $r) use ($routes) {
+            foreach ($routes as $route) {
+                $r->addRoute(
+                    $route['method'],
+                    $route['path'],
+                    "\RetwisReplica\Controller\\${route['handler']}"
+                );
+            }
+        });
+
+        return $dispatcher;
+    }
+
+    public function handleRoute(array $routeInfo) {
+        list(,$handler, $vars) = $routeInfo;
+
+        $handler = explode('::', $handler);
+
+        $controller = $handler[0];
+        if (!isset($handler[1])) {
+            throw new Exception('il manque la méthode');
+        }
+
+        $method = $handler[1];
+
+        if (false === is_callable([$controller, $method])) {
+            throw new Exception('method is not callable');
+        }
+
+        call_user_func_array([new $controller(), $method], $vars);
     }
 }
