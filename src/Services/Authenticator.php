@@ -13,7 +13,7 @@ class Authenticator
         $this->redis = (new App())->getRedis();
     }
 
-    public function logUser()
+    public function checkCredentials()
     {
         $username = $_POST['username'] ?? null;
         $password = $_POST['password'] ?? null;
@@ -32,7 +32,7 @@ class Authenticator
             return false;
         }
 
-        $this->startSession($id);
+        return $id;
     }
 
     public function startSession($userId) {

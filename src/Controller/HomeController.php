@@ -10,10 +10,18 @@ class HomeController extends Controller
 
     public function login()
     {
+        if ($this->authenticator->isLoggedIn()) {
+            return $this->redirect('home');
+        }
+
         $message = null;
 
-        if ($this->isPost() && false !== $this->authenticator->logUser()) {
-            return $this->redirect('profile');
+        if ($this->isPost()) {
+            if ($id = $this->authenticator->checkCredentials()) {
+                $this->authenticator->startSession($id);
+                return $this->redirect('profile');
+            }
+            $message = 'Invalid credentials';
         }
 
         return $this->render('home/login', [
