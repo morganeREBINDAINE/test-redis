@@ -2,8 +2,6 @@
 
 namespace RetwisReplica\Controller;
 
-use RetwisReplica\Services\Authenticator;
-
 class HomeController extends Controller
 {
     public function home() {
@@ -12,11 +10,10 @@ class HomeController extends Controller
 
     public function login()
     {
-        $authenticator = new Authenticator();
         $message = null;
 
-        if ($this->isPost() && false !== $authenticator->logUser()) {
-            $message = 'you are logged in!!';
+        if ($this->isPost() && false !== $this->authenticator->logUser()) {
+            return $this->redirect('profile');
         }
 
         return $this->render('home/login', [
@@ -25,6 +22,16 @@ class HomeController extends Controller
     }
 
     public function register() {
+        if ($this->authenticator->isLoggedIn()) {
+            return $this->redirect('home');
+        }
         return $this->render('home/register');
+    }
+
+    public function profile() {
+        if (false === $this->authenticator->isLoggedIn()) {
+            $this->forbid();
+        }
+        return $this->render('home/profile');
     }
 }

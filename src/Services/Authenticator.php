@@ -43,7 +43,7 @@ class Authenticator
         $this->redis->hdel("auth", [$sessionId]);
         $this->redis->hset("auth", $sessionId, $userId);
 
-        setcookie('sessid2', $sessionId);
+        setcookie('sessid', $sessionId);
     }
 
     public function isLoggedIn()
@@ -53,9 +53,10 @@ class Authenticator
         if ($sessid) {
             $userId = $this->redis->hget('auth', $sessid);
             $userSession = $this->redis->hget("user:$userId", 'auth');
-            if ($userSession !== $sessid) {
-                setcookie('sessid', null, -1);
+            if ($userSession === $sessid) {
+                return true;
             }
+            setcookie('sessid', null, -1);
         }
 
         return false;

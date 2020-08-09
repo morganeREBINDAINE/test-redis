@@ -10,3 +10,8 @@ register:
     path: /m-enregistrer
     handler: HomeController::register
     method: GET
+
+profile:
+    path: /mon-profile
+    handler: HomeController::profile
+    method: GET
