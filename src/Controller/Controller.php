@@ -2,35 +2,31 @@
 
 namespace RetwisReplica\Controller;
 
+use Exception;
+use RetwisReplica\App\{App, Twig};
+
 abstract class Controller
 {
     public $twig;
 
     public function __construct()
     {
-        $this->twig = $this->initTwig();
-    }
-
-    private function initTwig()
-    {
-        $loader = new \Twig\Loader\FilesystemLoader(ROOT_PATH . '/templates');
-        $twig = new \Twig\Environment($loader);
-
-        return $twig;
+        $this->twig = (new Twig())->getTwig();
     }
 
     protected function render(string $template, array $vars = []) {
         try {
             echo $this->twig->render("$template.html.twig", $vars);
-        } catch (\Exception $exception) {
-            $this->throwError(400);
+        } catch (Exception $exception) {
+            App::throwError(400);
+            // @todo display error page with generic message, log stack trace
             $this->render('errors/400', [
-                'errorMessage' => 'Erreur: le template existe pas.'
+                'errorMessage' => $exception->getMessage() . '<br>' . $exception->getTraceAsString()
             ]);
         }
     }
 
-    protected function throwError($code) {
-        http_response_code($code);
+    protected function isPost() {
+        return 'POST' === $_SERVER['REQUEST_METHOD'];
     }
 }

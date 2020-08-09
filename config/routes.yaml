@@ -5,7 +5,7 @@ home:
 login:
     path: /me-connecter
     handler: HomeController::login
-    method: GET
+    method: [GET, POST]
 register:
     path: /m-enregistrer
     handler: HomeController::register

@@ -2,7 +2,7 @@
 
 namespace RetwisReplica\App;
 
-use Predis\{Client};
+use Predis\{Client, Autoloader};
 
 class App {
     public $redis;
@@ -13,9 +13,12 @@ class App {
     }
 
     public function getRedis() {
-        require_once ('../Predis/Autoloader.php');
-        Predis\Autoloader::register();
+        Autoloader::register();
 
         return new Client();
+    }
+
+    public static function throwError($code) {
+        http_response_code($code);
     }
 }

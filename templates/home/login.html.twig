@@ -1,18 +1,19 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
+    {{ message }}
     <div>
         <h1>Se connecter</h1>
     </div>
     <div>
-        <form method="post" action="">
+        <form method="post">
             <div class="form-group">
                 <label for="username">Pseudo</label>
-                <input class="form-control" type="text" name="username">
+                <input class="form-control" type="text" name="username" id="username">
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe</label>
-                <input class="form-control" type="text" name="password">
+                <input class="form-control" type="text" name="password" id="password">
             </div>
             <button class="btn btn-info" type="submit">Valider</button>
         </form>

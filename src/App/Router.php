@@ -3,7 +3,7 @@
 namespace RetwisReplica\App;
 
 use \Exception;
-use FastRoute\RouteCollector;
+use FastRoute\{Dispatcher, RouteCollector};
 use function FastRoute\simpleDispatcher;
 
 class Router
@@ -14,14 +14,16 @@ class Router
         $routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 
         switch ($routeInfo[0]) {
-            case \FastRoute\Dispatcher::NOT_FOUND:
+            case Dispatcher::NOT_FOUND:
+                App::throwError(404);
                 echo 'not found';
                 break;
-            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+            case Dispatcher::METHOD_NOT_ALLOWED:
+                App::throwError(403);
                 $allowedMethods = $routeInfo[1];
-                // ... 405 Method Not Allowed
+                echo 'not allowed : ' . print_r($allowedMethods);
                 break;
-            case \FastRoute\Dispatcher::FOUND:
+            case Dispatcher::FOUND:
                 try {
                     $this->handleRoute($routeInfo);
                 } catch (Exception $e) {
@@ -31,14 +33,9 @@ class Router
         }
     }
 
-    public function getRoutes()
-    {
-        return yaml_parse_file(CONFIG_PATH . '/routes.yaml');
-    }
-
     public function getDispatcher()
     {
-        $routes = $this->getRoutes();
+        $routes = Config::getRoutes();
 
         $dispatcher = simpleDispatcher(function(RouteCollector $r) use ($routes) {
             foreach ($routes as $route) {
@@ -60,13 +57,13 @@ class Router
 
         $controller = $handler[0];
         if (!isset($handler[1])) {
-            throw new Exception('il manque la méthode');
+            throw new \RuntimeException('il manque la méthode');
         }
 
         $method = $handler[1];
 
         if (false === is_callable([$controller, $method])) {
-            throw new Exception('method is not callable');
+            throw new \RuntimeException('method is not callable');
         }
 
         call_user_func_array([new $controller(), $method], $vars);
