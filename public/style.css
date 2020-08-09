@@ -1,3 +1,7 @@
 .home-container {
     background: #b7b7b7;
 }
+
+.form-control {
+    width: 400px;
+}
